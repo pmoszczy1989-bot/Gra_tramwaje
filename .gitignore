@@ -1,0 +1,20 @@
+# Pobrane dane GTFS (wejście dla build_lines.py)
+gtfs.zip
+gtfs/
+
+# Python
+__pycache__/
+*.pyc
+
+# Edytory i systemy
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Logi i pliki tymczasowe
+*.log
+*.tmp
+node_modules/
