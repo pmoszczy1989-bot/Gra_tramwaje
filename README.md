@@ -1,6 +1,6 @@
 # Symulator IBIS – dokumentacja projektu
 
-Pikselowa gra przeglądarkowa: prowadzisz tramwaj lub autobus MPK Wrocław. Kursy, przystanki i rozkłady pochodzą z prawdziwych danych GTFS, a obsługa odbywa się z panelu kierowcy wzorowanego na Trapeze/IBIS. Styl graficzny jest inspirowany grą [pikselarnia.pl/gry/tramwaj](https://pikselarnia.pl/gry/tramwaj/).
+Pikselowa gra przeglądarkowa: prowadzisz tramwaj lub autobus MPK Wrocław. Kursy, przystanki i rozkłady pochodzą z prawdziwych danych GTFS, a obsługa odbywa się z panelu kierowcy wzorowanego na Trapeze/IBIS.
 
 ---
 
