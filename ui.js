@@ -536,8 +536,14 @@ addEventListener('keydown', e => {
   }
 });
 addEventListener('keyup', e => { if (KEYMAP[e.code]) G.keys[KEYMAP[e.code]] = false; });
-cv.addEventListener('pointerdown', e => { AU.init(); G.mouse = e.clientX > innerWidth / 2 ? 1 : -1; });
-addEventListener('pointerup', () => G.mouse = 0);
+// pedały dotykowe: prawa połowa ekranu – gaz, lewa – hamulec; śledzimy jeden palec (pointerId), więc dotknięcie panelu drugim palcem nie puszcza gazu
+let pedalId = null;
+const pedalSide = e => e.clientX > innerWidth / 2 ? 1 : -1;
+cv.addEventListener('pointerdown', e => { AU.init(); pedalId = e.pointerId; G.mouse = pedalSide(e); });
+cv.addEventListener('pointermove', e => { if (e.pointerId === pedalId) G.mouse = pedalSide(e); });
+const pedalUp = e => { if (pedalId === null || e.pointerId === pedalId) { pedalId = null; G.mouse = 0; } };
+addEventListener('pointerup', pedalUp); addEventListener('pointercancel', pedalUp);
+cv.addEventListener('contextmenu', e => e.preventDefault());
 document.getElementById('panel').addEventListener('pointerdown', e => { const t = e.target.closest('[data-a]'); if (t) { e.preventDefault(); UI.act(t.dataset.a); } });
 // ===== Ustawienia warunków (menu startowe) =====
 (function () {
@@ -565,6 +571,55 @@ document.getElementById('panel').addEventListener('pointerdown', e => { const t 
   if (sel) { if (![...sel.options].some(o => o.value === th)) th = 'classic'; sel.value = th; sel.onchange = () => apply(sel.value); }
   apply(th);
 })();
+// ===== Rozpoznawanie urządzenia: komputer / tablet / smartfon =====
+// Klasy na <body>: dev-desktop|dev-tablet|dev-phone, touch, portrait|landscape; zmienna CSS --ps = skala panelu kierowcy.
+// Wymuszenie do testów: index.html?dev=phone (albo tablet / desktop).
+const DEV = {
+  kind: 'desktop', touch: false, portrait: false,
+  NAMES: { desktop: 'komputer', tablet: 'tablet', phone: 'smartfon' },
+  detect() {
+    const ua = navigator.userAgent || '', uad = navigator.userAgentData, mq = q => !!(window.matchMedia && matchMedia(q).matches);
+    const coarse = mq('(pointer:coarse)'), hover = mq('(hover:hover)'), tp = navigator.maxTouchPoints || 0;
+    const ipad = /iPad/.test(ua) || (/Macintosh/.test(ua) && tp > 1);
+    const mobUA = (uad && uad.mobile) || /iPhone|iPod|Android.+Mobile|Windows Phone|Mobi/i.test(ua);
+    const tabUA = ipad || /Android|Tablet|Silk|Kindle|PlayBook/i.test(ua);
+    let k = 'desktop';
+    if (mobUA || tabUA || (coarse && !hover)) {
+      // o telefonie/tablecie rozstrzyga krótszy bok ekranu (telefony < 600 px CSS)
+      const side = Math.min(screen.width || innerWidth, screen.height || innerHeight);
+      k = side < 600 ? 'phone' : 'tablet';
+    }
+    const f = (new URLSearchParams(location.search).get('dev') || '').toLowerCase();
+    if (this.NAMES[f]) k = f;
+    this.kind = k; this.touch = k !== 'desktop' || (coarse && tp > 0);
+  },
+  apply() {
+    const b = document.body, vw = innerWidth, vh = innerHeight, k = this.kind;
+    this.portrait = vh > vw;
+    for (const n of ['desktop', 'tablet', 'phone']) b.classList.toggle('dev-' + n, n === k);
+    b.classList.toggle('touch', this.touch); b.classList.toggle('portrait', this.portrait); b.classList.toggle('landscape', !this.portrait);
+    // panel ma naturalnie 330–540 px szerokości (34vw) + pasek akcji pod spodem i F1–F4 z boku; na mniejszych ekranach zmniejszamy go
+    let s = 1;
+    if (k !== 'desktop') {
+      const pw = Math.min(540, Math.max(330, vw * .34)), fw = Math.min(62, Math.max(46, vw * .042)), ph = pw * 5 / 8 + 50;
+      s = k === 'phone' ? Math.min(1, vh * .56 / ph, vw * .44 / (pw + fw + 12)) : Math.min(1, vh * .62 / ph, vw * .52 / (pw + fw + 12));
+    }
+    document.documentElement.style.setProperty('--ps', Math.max(.4, s).toFixed(3));
+  },
+  init() {
+    this.detect(); this.apply();
+    const upd = () => { this.apply(); resize(); };
+    addEventListener('resize', upd); addEventListener('orientationchange', () => setTimeout(upd, 150));
+    if (window.visualViewport) visualViewport.addEventListener('resize', upd);
+    const ti = document.getElementById('touchinfo');
+    if (ti) ti.innerHTML = `📱 Wykryto: <b>${this.NAMES[this.kind]}</b>. Dotknij <b>prawej połowy</b> ekranu – gaz, <b>lewej</b> – hamulec. Przyciski akcji są pod panelem kierowcy, 📟 chowa panel.` + (this.kind === 'phone' ? ' Najwygodniej grać poziomo, na pełnym ekranie.' : '');
+    const pb = document.getElementById('panelbtn');
+    if (pb) pb.onclick = e => { e.stopPropagation(); document.body.classList.toggle('nopanel'); pb.blur(); };
+    const ro = document.getElementById('rotok');
+    if (ro) ro.onclick = () => document.body.classList.add('rotok');
+  }
+};
+DEV.init();
 // ===== Pełny ekran =====
 function toggleFS() {
   const d = document;

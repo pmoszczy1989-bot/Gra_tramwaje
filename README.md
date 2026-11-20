@@ -117,7 +117,17 @@ Do menu startowego można wrócić w każdej chwili przyciskiem **⚙ Menu głó
 | F4 | Wezwanie alarmowe CA (centrala alarmowa) – magenta |
 | M | Wyciszenie dźwięku (także przycisk 🔊/🔇 obok ⛶) |
 | Esc | Pauza / wznowienie |
-| Mysz / dotyk | Prawa połowa ekranu to gaz, lewa to hamulec. Pasek akcji na dole ekranu ma przyciski wszystkich czynności. |
+| Mysz / dotyk | Prawa połowa ekranu to gaz, lewa to hamulec (przesunięcie palca na drugą połowę zmienia pedał). Pasek akcji pod panelem kierowcy ma przyciski wszystkich czynności. |
+
+### 3.3.1 Telefony i tablety
+
+Gra sama rozpoznaje urządzenie (`DEV` w `ui.js`) i ustawia na `<body>` klasy `dev-desktop` / `dev-tablet` / `dev-phone`, `touch` oraz `portrait` / `landscape`:
+
+- **Rozpoznanie:** `navigator.userAgentData.mobile`, user-agent (iPhone, Android Mobile, iPad – także iPadOS udający Maca), `pointer:coarse` bez `hover`. Urządzenie dotykowe z krótszym bokiem ekranu < 600 px to smartfon, większe – tablet. Do testów można wymusić typ parametrem `index.html?dev=phone` (albo `tablet`, `desktop`).
+- **Skalowanie:** panel kierowcy (z paskiem akcji i F1–F4) jest zmniejszany przez zmienną CSS `--ps` tak, by zajmował najwyżej ok. 56% wysokości i 44% szerokości ekranu telefonu (62% / 52% na tablecie). Na telefonie paski LED, lista zadań, minimapa, powiększone sygnalizatory i menu startowe są mniejsze; uwzględniane są wcięcia ekranu (`env(safe-area-inset-*)`) i `100dvh`.
+- **Dotyk:** przyciski akcji są większe i bez podpowiedzi klawiszy, przycisk 📟 chowa/pokazuje panel kierowcy, gaz/hamulec śledzi jeden palec (dotknięcie panelu drugim palcem nie puszcza gazu).
+- **Orientacja:** na telefonie w pionie podczas jazdy pojawia się prośba o obrócenie ekranu (przycisk „Graj w pionie” ją ukrywa). Na ekranie startowym urządzenia dotykowe widzą opis sterowania dotykiem i wykryty typ urządzenia.
+
 
 ### 3.4 Zasady i punktacja (wybór)
 
@@ -341,6 +351,7 @@ Skręty leżą w tym samym miejscu odcinka (ułamek długości) co w rzeczywisto
 | `ptext` | render | Czcionka pikselowa z polskimi znakami. |
 | `UI.setPanel`, `UI.render`, `UI.act` | ui | Panel IBIS (stany: `off`, `login`, `menu`, `linekurs`, `route`, `trip`, `veh`, `train`, `scores`, `msgs`, `info`, `help`). |
 | `hints()`, `updateLeds()`, `sigZoom()`, `drawMinimap()` | ui | Elementy HUD. |
+| `DEV.detect`, `DEV.apply` | ui | Rozpoznanie komputer/tablet/smartfon, klasy `dev-*`/`touch`/`portrait` na `<body>` i skala panelu `--ps`. |
 | `frame(t)` | ui | Główna pętla: `update` + `draw` co klatkę, HUD co 0,1 s, minimapa co 0,3 s. |
 
 ### 5.3 Pętla gry
@@ -473,5 +484,5 @@ Pojazdy są wizualnie wydłużone (`LEN_K = 1.45`), a prawdziwa długość jest 
 - Odległości między przystankami są skrócone (`SEG` w `core.js`), a rozkład dotyczy tylko jednego dnia roboczego.
 - Ronda są losowe (nie wynikają z kształtu trasy), a łagodne łuki ulic (< 40°) i zawracanie (> 150°) nie są odwzorowywane.
 - Autopilot (`demo.js`) jest dostrojony do placu treningowego; na prawdziwych liniach autobus czasem zostaje na lewym pasie.
-- Na wąskich ekranach (< 760 px) nakładki są zmniejszane, a lista zadań jest ukryta podczas pokazu.
+- Na wąskich ekranach (< 760 px) nakładki są zmniejszane, a lista zadań jest ukryta podczas pokazu. Na telefonie najwygodniej grać poziomo; awaryjne hamowanie (Spacja) i klawisze ogłoszeń 1–9 nie mają osobnych przycisków dotykowych (ogłoszenia są w panelu 🔈).
 - Głos zapowiedzi zależy od dostępności polskiego głosu w `speechSynthesis` systemu.

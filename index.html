@@ -2,12 +2,16 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0f14">
 <title>STiA – Symulator Tramwajów i Autobusów</title>
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;height:100%;background:#0b0f14;overflow:hidden;font-family:Segoe UI,Arial,sans-serif;user-select:none}
-#game{position:fixed;inset:0;width:100vw;height:100vh;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+html,body{margin:0;height:100%;background:#0b0f14;overflow:hidden;font-family:Segoe UI,Arial,sans-serif;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;overscroll-behavior:none}
+:root{--ps:1;--mmw:min(18vw,240px)}
+#game{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;touch-action:none;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
 .led{position:fixed;left:0;right:0;height:34px;background:#120c02;color:#ffb000;font:bold 18px/34px Consolas,monospace;
   display:flex;gap:18px;padding:0 12px;white-space:nowrap;overflow:hidden;z-index:5;text-shadow:0 0 6px #ff9000;border:2px solid #2a1d05}
 .led::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,transparent 45%,rgba(0,0,0,.55) 55%) 0 0/3px 3px}
@@ -62,7 +66,7 @@ html,body{margin:0;height:100%;background:#0b0f14;overflow:hidden;font-family:Se
 #tasks{position:fixed;top:40px;left:8px;z-index:5;max-width:40vw;font:bold 14px Segoe UI,Arial;color:#fff;pointer-events:none}
 #tasks div{background:#000a;margin-bottom:3px;padding:3px 8px;border-left:4px solid #ffb000;border-radius:2px}
 #tasks .urg{border-color:#ff3b2a;animation:ur .6s steps(2) infinite}@keyframes ur{50%{background:#a01818cc}}
-#minimap{position:fixed;right:8px;bottom:38px;width:min(18vw,240px);height:auto;z-index:5;border:2px solid #3a4048;border-radius:6px;background:#0d1117}
+#minimap{position:fixed;right:8px;bottom:38px;width:var(--mmw);height:auto;z-index:5;border:2px solid #3a4048;border-radius:6px;background:#0d1117}
 #toast{position:fixed;left:50%;bottom:44px;transform:translateX(-50%);background:#000c;color:#fff;padding:6px 14px;border-radius:4px;font:bold 15px Segoe UI;
   opacity:0;transition:opacity .2s;z-index:9;pointer-events:none}#toast.on{opacity:1}
 #start{position:fixed;inset:0;z-index:20;display:flex;color:#eaf1f8;padding:24px;overflow:auto;
@@ -132,8 +136,8 @@ html,body{margin:0;height:100%;background:#0b0f14;overflow:hidden;font-family:Se
 #sigzoom .zl small{display:block;font:600 11px Segoe UI;color:#cfd8e2;margin-top:2px}
 #sigzoom .zarr{font:900 40px Segoe UI;color:#ffcf3a;width:44px;text-align:center}
 #sigzoom{gap:4px}#sigzoom .zb.zi{padding:3px 8px 4px;border-radius:8px;min-width:170px;border-left-width:5px}#sigzoom .zi .zl{font-size:14px;max-width:none}#sigzoom .zi .zl small{font-size:10.5px}#sigzoom .zi:not(.R):not(.Y):not(.G) .zl{color:#e6edf3}
-#fsbtn,#mutebtn{position:fixed;right:calc(min(18vw,240px) + 16px);bottom:38px;z-index:21;width:34px;height:34px;border-radius:7px;border:2px solid #3a4048;background:#0d1117dd;color:#e6edf3;font:700 19px Segoe UI;cursor:pointer;padding:0;line-height:28px}#fsbtn:hover,#mutebtn:hover{border-color:#ffb000;color:#ffb000}#mutebtn{right:calc(min(18vw,240px) + 56px);font-size:17px}
-body.pt-piks #fsbtn,body.pt-piks #mutebtn{bottom:44px;border-radius:4px}
+#fsbtn,#mutebtn,#panelbtn{position:fixed;right:calc(var(--mmw) + 16px);bottom:38px;z-index:21;width:34px;height:34px;border-radius:7px;border:2px solid #3a4048;background:#0d1117dd;color:#e6edf3;font:700 19px Segoe UI;cursor:pointer;padding:0;line-height:28px}#fsbtn:hover,#mutebtn:hover,#panelbtn:hover{border-color:#ffb000;color:#ffb000}#mutebtn{right:calc(var(--mmw) + 56px);font-size:17px}#panelbtn{right:calc(var(--mmw) + 96px);font-size:17px;display:none}
+body.pt-piks #fsbtn,body.pt-piks #mutebtn,body.pt-piks #panelbtn{bottom:44px;border-radius:4px}
 #demo{position:fixed;left:50%;top:44px;transform:translateX(-50%);z-index:7;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:Segoe UI,Arial;color:#fff;pointer-events:none}
 #demo.hide,#demo .hide{display:none!important}#demo.kid .dh{background:#2ea44f}#demo .dbig small{font-size:15px;opacity:.85;margin-left:6px}
 body.demo #tasks{display:none}
@@ -331,6 +335,42 @@ body.pt-trap :is(.pt,.ct) svg [stroke]:not([stroke=none]){stroke:#a6a6a6}body.pt
 body.pt-night :is(.pt,.ct) svg [stroke]:not([stroke=none]){stroke:#c03a2e}body.pt-night :is(.pt,.ct) svg [fill]:not([fill=none]){fill:#c03a2e}body.pt-night .btn.on svg [stroke]:not([stroke=none]){stroke:#ffd0c8}body.pt-night .btn.on svg [fill]:not([fill=none]){fill:#ffd0c8}body.pt-night .clock svg [stroke]:not([stroke=none]){stroke:#ffd0c8}body.pt-night .clock svg [fill]:not([fill=none]){fill:#ffd0c8}
 body.pt-day :is(.pt,.ct) svg [stroke]:not([stroke=none]){stroke:#2c333b}body.pt-day :is(.pt,.ct) svg [fill]:not([fill=none]){fill:#2c333b}body.pt-day .btn.on svg [stroke]:not([stroke=none]){stroke:#fff}body.pt-day .btn.on svg [fill]:not([fill=none]){fill:#fff}body.pt-day .clock svg [stroke]:not([stroke=none]){stroke:#fff}body.pt-day .clock svg [fill]:not([fill=none]){fill:#fff}
 body.pt-piks :is(.pt,.ct) svg [stroke]:not([stroke=none]){stroke:#f0e8d4}body.pt-piks :is(.pt,.ct) svg [fill]:not([fill=none]){fill:#f0e8d4}body.pt-piks .btn.on svg [stroke]:not([stroke=none]){stroke:#ffb438}body.pt-piks .btn.on svg [fill]:not([fill=none]){fill:#ffb438}body.pt-piks .clock svg [stroke]:not([stroke=none]){stroke:#8cec60}body.pt-piks .clock svg [fill]:not([fill=none]){fill:#8cec60}
+/* ===== Urządzenia mobilne: klasy body.dev-phone / dev-tablet / dev-desktop, .touch, .portrait (ustawia DEV w ui.js) ===== */
+#rotate{display:none;position:fixed;inset:0;z-index:40;background:#0b0f14f2;color:#eaf1f8;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px;font:700 18px Segoe UI,Arial}
+#rotate .ri{font-size:64px;animation:rot 1.6s ease-in-out infinite}@keyframes rot{50%{transform:rotate(-90deg)}}
+#rotate button{font:700 14px Segoe UI;color:#fff;background:#2a3a52;border:1px solid #3a4b63;border-radius:8px;padding:8px 14px;cursor:pointer}
+body.dev-phone.portrait:not(.rotok) #start.hide~#rotate{display:flex}
+#start .touchinfo{display:none;margin-top:12px;padding:8px 12px;border-radius:10px;background:#1f6fd122;border:1px solid #1f6fd166;color:#cfe0f2;font-size:13px;line-height:1.5}
+body.touch #start .touchinfo{display:block}
+#panel{transform:scale(var(--ps));transform-origin:calc(100% + clamp(46px,4.2vw,62px) + 9px) 0}
+body.touch #panelbtn{display:block}
+body.nopanel #panel{display:none}
+body.touch .ab kbd,body.touch .fb kbd{display:none}
+body.touch .ab{font-size:12px;min-width:58px;padding:8px 8px 6px}
+body.touch #fsbtn,body.touch #mutebtn,body.touch #panelbtn{width:40px;height:40px;line-height:34px}
+body.touch #mutebtn{right:calc(var(--mmw) + 62px)}body.touch #panelbtn{right:calc(var(--mmw) + 108px)}
+body.dev-phone{--mmw:min(15vw,26dvh)}
+body.dev-phone .led{height:26px;font-size:14px;line-height:26px;gap:10px;padding:0 max(8px,env(safe-area-inset-right)) 0 max(8px,env(safe-area-inset-left))}
+body.dev-phone #ledbot{height:24px;font-size:13px;line-height:24px}
+body.dev-phone #panel{top:31px;right:calc(clamp(46px,4.2vw,62px) + 12px + env(safe-area-inset-right));font-size:12px}
+body.dev-phone #tasks{top:31px;left:max(6px,env(safe-area-inset-left));max-width:34vw;font-size:12px}
+body.dev-phone #tasks div{padding:2px 6px}
+body.dev-phone #minimap{right:max(6px,env(safe-area-inset-right));bottom:30px}
+body.dev-phone #fsbtn,body.dev-phone #mutebtn,body.dev-phone #panelbtn{bottom:30px}
+body.dev-phone #toast{bottom:34px;font-size:13px;max-width:90vw;white-space:normal;text-align:center}
+body.dev-phone #sigzoom{left:max(6px,env(safe-area-inset-left));bottom:30px;transform:scale(.8);transform-origin:0 100%}
+body.dev-phone #demo{top:32px}body.dev-phone #demo .dmsg{font-size:13px;max-width:70vw}
+body.dev-phone #start{padding:12px max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left))}
+body.dev-phone #start .wrap{gap:16px}
+body.dev-phone #start h1{font-size:clamp(32px,8vw,48px)}
+body.dev-phone #start .sub{font-size:14px;margin:8px 0 12px}
+body.dev-phone #start .stat{padding:5px 10px}body.dev-phone #start .stat b{font-size:16px}
+body.dev-phone #start .ch{gap:8px}
+body.dev-phone #start button{min-height:84px;padding:10px 12px;font-size:15px;border-radius:14px}
+body.dev-phone #start button .ico{width:36px;height:36px;font-size:22px;border-radius:10px}
+body.dev-phone #start button small{font-size:11px}
+body.dev-phone #start .feat,body.dev-phone #start details .keys{display:none}
+body.dev-tablet #start button{min-height:110px}
 </style>
 </head>
 <body>
@@ -344,6 +384,7 @@ body.pt-piks :is(.pt,.ct) svg [stroke]:not([stroke=none]){stroke:#f0e8d4}body.pt
 <div id="sigzoom"></div>
 <button id="mutebtn" type="button" title="Wycisz dźwięk (M)">🔊</button>
 <button id="fsbtn" type="button" title="Pełny ekran (G)">⛶</button>
+<button id="panelbtn" type="button" title="Pokaż / ukryj panel kierowcy">📟</button>
 <div id="demo" class="hide"></div>
 <svg width="0" height="0" style="position:absolute"><filter id="glw" filterUnits="userSpaceOnUse" x="-50" y="-50" width="200" height="220"><feGaussianBlur stdDeviation="2.2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></svg>
 <div id="start"><div class="wrap">
@@ -352,6 +393,7 @@ body.pt-piks :is(.pt,.ct) svg [stroke]:not([stroke=none]){stroke:#f0e8d4}body.pt
     <h1><span>SYMULATOR TRAMWAJÓW I AUTOBUSÓW</span>STiA</h1>
     <div class="sub">Poprowadź tramwaj lub autobus po prawdziwych liniach Wrocławia – z panelem kierowcy, rozkładem jazdy, zwrotnicami, rampą i ruchem ulicznym.</div>
     <div class="stats"><div class="stat"><b>24</b>linie tramwajowe</div><div class="stat"><b>112</b>linii autobusowych</div><div class="stat"><b>13</b>modeli taboru</div></div>
+    <div class="touchinfo" id="touchinfo"></div>
     <div class="feat"><span>🔀 Skręty na skrzyżowaniach</span><span>⭕ Ronda</span><span>🌦 Pogoda i pory roku</span><span>🚦 Sygnalizacja</span><span>🏛 Atrakcje Wrocławia</span></div>
   <div class="env pl">
     <label>Nazwa kierowcy<input type="text" id="plName" maxlength="20" placeholder="np. Ania" autocomplete="nickname"></label>
@@ -388,13 +430,14 @@ body.pt-piks :is(.pt,.ct) svg [stroke]:not([stroke=none]){stroke:#f0e8d4}body.pt
   <div class="attr">Rozkłady i przystanki: Otwarte Dane Wrocław (GTFS)</div>
 </div>
 </div>
+<div id="rotate"><div class="ri">📱</div>Obróć telefon poziomo,<br>żeby wygodnie prowadzić pojazd<button type="button" id="rotok">Graj w pionie</button></div>
 <div id="board" class="hide"><div class="bwin"><div class="bhead"><b>🏆 Tabela wyników</b><span><button type="button" class="now" id="boardExp" title="Zapisz tabelę do pliku .json">💾 Eksportuj</button><button type="button" class="now" id="boardImp" title="Wczytaj tabelę z pliku .json (połączy z obecną)">📂 Importuj</button><input type="file" id="boardFile" accept=".json,application/json" hidden><button type="button" class="now" id="boardClr">🗑 Wyczyść</button><button type="button" class="now" data-x="close">✕ Zamknij</button></span></div><div id="boardBody"></div></div></div>
-<script src="lines.js?v=44"></script>
-<script src="core.js?v=44"></script>
-<script src="events.js?v=44"></script>
-<script src="render.js?v=44"></script>
-<script src="topdown.js?v=44"></script>
-<script src="demo.js?v=44"></script>
-<script src="ui.js?v=44"></script>
+<script src="lines.js?v=45"></script>
+<script src="core.js?v=45"></script>
+<script src="events.js?v=45"></script>
+<script src="render.js?v=45"></script>
+<script src="topdown.js?v=45"></script>
+<script src="demo.js?v=45"></script>
+<script src="ui.js?v=45"></script>
 </body>
 </html>
